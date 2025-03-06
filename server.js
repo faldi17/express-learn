@@ -1,22 +1,24 @@
 const express = require("express");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
 const app = express();
-const port = 5001;
+const PORT = process.env.PORT || 5001;
+
+mongoose
+	.connect(process.env.MONGO_URI)
+	.then(() => console.log("🔥 MongoDB Connected"))
+	.catch((err) => console.error("❌ MongoDB Connection Error:", err));
+
+app.use(express.json());
+
+const userRoutes = require("./routes/userRoutes");
+app.use("/users", userRoutes);
 
 app.get("/", (req, res) => {
-	res.send("Halo, Express!");
+	res.send("Server jalan! 🚀");
 });
 
-app.listen(port, () => {
-	console.log(`Server berjalan di http://localhost:${port}`);
-});
-
-// buat route
-const users = [
-	{id: 1, name: "Guntur"},
-	{id: 2, name: "Kaling"},
-	{id: 3, name: "Erlangga"},
-];
-
-app.get("/users", (req, res) => {
-	res.json(users);
+app.listen(PORT, () => {
+	console.log(`Server berjalan di http://localhost:${PORT}`);
 });

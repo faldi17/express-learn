@@ -1,18 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User"); // Import model
+const User = require("../models/User");
 
-// API: Ambil semua user
 router.get("/", async (req, res) => {
-	const users = await User.find();
-	res.json(users);
+	try {
+		const users = await User.find();
+		res.json(users);
+	} catch (error) {
+		res.status(500).json({error: error.message});
+	}
 });
 
-// API: Tambah user baru
 router.post("/", async (req, res) => {
-	const newUser = new User({name: req.body.name});
-	await newUser.save();
-	res.json({message: "User ditambahkan!", user: newUser});
+	try {
+		const {name} = req.body;
+		if (!name)
+			return res.status(400).json({error: "Name tidak boleh kosong!"});
+
+		const newUser = new User({name});
+		await newUser.save();
+
+		res.status(201).json({
+			message: "User berhasil ditambahkan!",
+			user: newUser,
+		});
+	} catch (error) {
+		res.status(500).json({error: error.message});
+	}
 });
 
 module.exports = router;
